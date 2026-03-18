@@ -32,7 +32,7 @@ passport.use(new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: "http://localhost:4000/auth/google/callback",
+    callbackURL: `${process.env.BACKEND_URL || "http://localhost:4000"}/auth/google/callback`,
   },
   async (_accessToken, _refreshToken, profile, done) => {
     try {
@@ -73,7 +73,7 @@ async function main() {
 
   const app = express();
   app.use(cors({
-    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", process.env.CLIENT_URL || ""].filter(Boolean),
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
@@ -84,11 +84,11 @@ async function main() {
   app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"], session: false }));
 
   app.get("/auth/google/callback",
-    passport.authenticate("google", { session: false, failureRedirect: "http://localhost:3002/login?error=oauth_failed" }),
+    passport.authenticate("google", { session: false, failureRedirect: `${process.env.CLIENT_URL || "http://localhost:3002"}/login?error=oauth_failed` }),
     (req: Request, res: Response) => {
       const user = req.user as any;
       const token = jwt.sign({ userId: String(user._id) }, JWT_SECRET, { expiresIn: "7d" });
-      res.redirect(`http://localhost:3002?token=${token}`);
+      res.redirect(`${process.env.CLIENT_URL || "http://localhost:3002"}?token=${token}`);
     }
   );
 
