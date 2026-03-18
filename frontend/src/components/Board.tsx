@@ -375,7 +375,7 @@ export default function Board({ boardId, onBack, onLogout, userName, isOwner = t
     formData.append("file", file);
     setUploading(true);
     try {
-      await fetch(`http://localhost:4000/upload/${attachTask.id}`, {
+      await fetch(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:4000"}/upload/${attachTask.id}`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

@@ -3,8 +3,11 @@ import { getMainDefinition } from "@apollo/client/utilities";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 
+const BACKEND_HTTP = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+const BACKEND_WS = process.env.REACT_APP_BACKEND_WS_URL || "ws://localhost:4000";
+
 const httpLink = new HttpLink({
-  uri: "http://localhost:4000/graphql",
+  uri: `${BACKEND_HTTP}/graphql`,
   fetch: (uri, options: any) => {
     const token = sessionStorage.getItem("token");
     if (token) {
@@ -16,7 +19,7 @@ const httpLink = new HttpLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://localhost:4000/graphql",
+    url: `${BACKEND_WS}/graphql`,
     connectionParams: () => ({
       authorization: sessionStorage.getItem("token") ? `Bearer ${sessionStorage.getItem("token")}` : "",
     }),
